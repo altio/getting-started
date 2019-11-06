@@ -1,0 +1,36 @@
+version: '3.7'
+
+x-service-vars:
+  &service-vars
+  DATABASE_URL: postgres://postgres:postgres@postgres/project
+  MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-accesskey}
+  MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-secretkey}
+  MINIO_ADDR: ${MINIO_ADDR_BIND:-127.0.0.1}
+  MINIO_PORT: ${MINIO_PORT:-9000}
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_ADDR: ${POSTGRES_ADDR_BIND:-127.0.0.1}
+  POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+  RABBITMQ_ADDR: ${RABBITMQ_ADDR_BIND:-127.0.0.1}
+
+services:
+  service1:
+    image: altio/service1-deploy:${DOCKER_IMAGE_TAG:-latest}
+    build:
+      # fixed or pass-through UID and USER args for container
+      # useful if you want to explicitly set context, otherwise default is good
+      args:
+        UID: ${UID:-1000}
+        USER: ${USER:-user}
+      cache_from:
+        - service1-dev:latest
+      context: .
+      target: deploy
+    entrypoint: pipenv
+    command: run gunicorn service1 0.0.0.0:8000
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      << : *service-vars

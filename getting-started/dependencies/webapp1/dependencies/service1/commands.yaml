@@ -1,0 +1,13 @@
+commands:
+  run-pipenv:
+    extends: compose
+    args: run --rm service1
+  exec-pipenv:
+    extends: compose
+    args: exec service1  # {command} {args}
+  shell:
+    extends: exec-pipenv
+    args: shell
+  manage:
+    extends: exec-pipenv
+    args: run python manage.py

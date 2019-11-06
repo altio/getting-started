@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  webapp1:
+    image: altio/webapp1-dev:${DOCKER_IMAGE_TAG:-latest}
+    build:
+      # expected to pass-through from host for dev
+      # very important for yielding files back to host layer
+      args:
+        UID: ${UID:-1000}
+      context: .
+      target: dev
+    entrypoint: npm
+    depends_on:
+      - service1
+    volumes:
+      - .:/app:z
+    command: start

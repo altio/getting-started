@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  webapp1:
+    build:
+      args:
+        UID: ${UID:-1000}
+      context: dependencies/webapp1
+      target: deploy

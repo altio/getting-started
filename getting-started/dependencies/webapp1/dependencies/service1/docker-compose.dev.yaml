@@ -1,0 +1,17 @@
+
+version: '3.7'
+
+services:
+  service1:
+    image: altio/service1-dev:${DOCKER_IMAGE_TAG:-latest}
+    build:
+      # expected to pass-through from host for dev
+      # very important for yielding files back to host layer
+      args:
+        UID: ${UID:-1000}
+        USER: ${USER:-user}
+      context: .
+      target: dev
+    volumes:
+      - .:/app:z
+    command: run bash -c "pipenv sync --dev && pipenv run manage.py devserver 0.0.0.0:8000"

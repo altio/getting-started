@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  webapp1:
+    image: altio/webapp1-deploy:${DOCKER_IMAGE_TAG:-latest}
+    build:
+      args:
+        UID: ${UID:-1000}
+      context: .
+      target: deploy
+    entrypoint: npm
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    depends_on:
+      - service1

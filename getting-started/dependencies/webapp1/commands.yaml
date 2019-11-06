@@ -1,0 +1,10 @@
+commands:
+  webapp1:
+    extends: compose
+    args: run --rm webapp1
+  npm:
+    extends: webapp1
+    args: npm
+  run:
+    extends: npm
+    args: run

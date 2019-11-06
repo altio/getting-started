@@ -1,0 +1,48 @@
+version: '3.7'
+
+x-minio-common:
+  &minio-common
+  image: minio/minio:RELEASE.2019-07-05T21-20-21Z
+  environment:
+    MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-accesskey}
+    MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-secretkey}
+  command: server http://minio{0...1}/data{1...2}
+
+services:
+  minio0:
+    << : *minio-common
+    volumes:
+      - data0-1:/data1
+      - data0-2:/data2
+    ports:
+      - "${MINIO_ADDR_BIND:-127.0.0.1}:${MINIO_PORT:-9000}:9000"
+  minio1:
+    << : *minio-common
+    volumes:
+      - data1-1:/data1
+      - data1-2:/data2
+    ports:
+      - "${MINIO_ADDR_BIND:-127.0.0.1}:${MINIO_PORT1:-9001}:9000"
+  postgres:
+    image: postgres:11.4-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "${POSTGRES_ADDR_BIND:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432"
+  rabbitmq:
+    image: rabbitmq:3.7.15-alpine
+    ports:
+      - "${RABBITMQ_ADDR_BIND:-127.0.0.1}:${RABBITMQ_PORT_EPMD:-4369}:4369"
+      - "${RABBITMQ_ADDR_BIND:-127.0.0.1}:${RABBITMQ_PORT_AMQP1:-5671}:5671"
+      - "${RABBITMQ_ADDR_BIND:-127.0.0.1}:${RABBITMQ_PORT_AMQP2:-5672}:5672"
+      - "${RABBITMQ_ADDR_BIND:-127.0.0.1}:${RABBITMQ_PORT_PRIVATE:-25672}:25672"
+  redis:
+    image: redis:5.0.5-alpine
+    ports:
+      - "${REDIS_ADDR_BIND:-127.0.0.1}:${REDIS_PORT:-6379}:6379"
+
+volumes:
+  data0-1:
+  data0-2:
+  data1-1:
+  data1-2:

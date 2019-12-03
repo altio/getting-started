@@ -1,0 +1,13 @@
+commands:
+  deploy:
+    extends: compose
+    options:
+      target:
+        - production
+        - staging
+        - testing
+    args: deploy {target}
+    args2: source ./dc run --no-deps --rm --use-aliases $*
+    args3: docker-compose -f dependencies/docker-compose.yml -f app1/docker-compose.yml -f docker-compose.yml --project-directory . $*
+    args4: dc up -d     dc rm -fs $1    run --service-ports $1
+    temp: return 'gcr.io/alt-io/{TARGET}-{LAYER}:{TAG}'.format(TARGET=TARGET, LAYER=LAYER, TAG=TAG)

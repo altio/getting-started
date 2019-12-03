@@ -13,6 +13,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     # install suitable versions of pip and pipenv for python env management
     && pip3 install --no-cache-dir --upgrade pip==18.0 pipenv
 
+# recommended for python in docker
+ENV PYTHONUNBUFFERED 1
+
+# direct pipenv to make venv in project dir
+ENV PIPENV_VENV_IN_PROJECT 1
+
+# prevent log pollution
+ENV PIPENV_NOSPIN 1
+
+# needed by pipenv to activate shell
+ENV LANG en_US.UTF-8
+ENV LC_ALL C.UTF-8
+ENV SHELL /bin/bash
+
 # provide build args of UID and USER. Matching the host's UID during dev allows
 # one to yield files to host fs w/ correct perms from the container
 ARG UID=1000
@@ -27,20 +41,6 @@ RUN echo "BASE IMAGE CREATED WITH ${USER} AS ${UID}" \
     && useradd -lmU -u ${UID} -s /bin/bash ${USER} \
     && mkdir /app \
     && chown -R ${USER}:${USER} /app
-
-# recommended for python in docker
-ENV PYTHONUNBUFFERED 1
-
-# direct pipenv to make venv in project dir
-ENV PIPENV_VENV_IN_PROJECT 1
-
-# prevent log pollution
-ENV PIPENV_NOSPIN 1
-
-# needed by pipenv to activate shell
-ENV LANG en_US.UTF-8
-ENV LC_ALL C.UTF-8
-ENV SHELL /bin/bash
 
 # set working directory to /app
 WORKDIR /app
@@ -96,6 +96,5 @@ RUN pipenv run pip install dist/*.whl \
     && pipenv install --deploy \
     # && pip install *.whl \
     && rm -fr dist
-
 
 USER $USER:$USER
